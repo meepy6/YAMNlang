@@ -7,7 +7,7 @@
 
 struct TrieNode {
     std::unordered_map<char, std::unique_ptr<TrieNode>> children;
-    bool isEndOfPath = false;
+    bool is_end_of_path = false;
 };
 
 class Trie {

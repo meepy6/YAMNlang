@@ -1,3 +1,11 @@
+/*
+TODO:
+
+ - prefix tree for operators
+ - update << operator override for Type enum
+ - update findContextOfMinusSymbolBasedOnPreviousToken to include cases for new tokens
+*/
+
 #include <iostream>
 #include <vector>
 #include <string>
@@ -15,17 +23,48 @@ enum class Type {
     // symbols
     OPEN_BRACKET,
     CLOSE_BRACKET,
+
     ADD,
+    ADD_ASSIGN, // new
+    INCREMENT, // new
+
     SUBTRACT,
+    SUBTRACT_ASSIGN, // new
+    DECREMENT, // new
+
     MULTIPLY,
+    MULTIPLY_ASSIGN, // new
+
     DIVIDE,
+    DIVIDE_ASSIGN, // new
+
+    FLOOR_DIVIDE, // new
+    FLOOR_DIVIDE_ASSIGN // new
+
     MODULO,
+    MODULO_ASSIGN, // new
+
     NEGATE,
+
     ASSIGN,
+
+    EQUALITY_COMPARISON, // new
+    LESS_THAN_COMPARISON, // new
+    MORE_THAN_COMPARISON, // new
+    LESS_THAN_EQUALS_COMPARISON, // new
+    MORE_THAN_EQUALS_COMPARISON, // new
+    INEQUALITY_COMPARISON, // new
+    BOOLEAN_INVERSION, // new
 
     // keywords (denoted by the suffix _KW)
     VAR_KW,
     SHOW_KW,
+    IF_KW, // new
+    ELSE_KW, // new
+    REPEAT_KW, // new
+    WHILE_KW, // new
+    LOGICAL_AND_KW, // new
+    LOGICAL_OR_KW // new
 
     // invalid
     INVALID,
