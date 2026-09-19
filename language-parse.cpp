@@ -1,15 +1,9 @@
-/*
-TODO:
- - prefix tree for operators
-*/
-
 #include <iostream>
 #include <vector>
 #include <string>
 #include <cctype>
 #include <unordered_map>
 #include "type-enum.hpp"
-#include "trie-tree.hpp"
 using namespace std;
 
 
@@ -30,97 +24,28 @@ vector<Token> parse(string code) {
 
     // parsing loop (uses while and manual increment to facilitate skipping ahead when we come across a literal or identifier)
     size_t i = 0;
+    string current = "";
     while (i < code.length()) {
         char curr = code[i];
+        string updCurrent = current;
+        updCurrent.push_back(curr);
 
-        // newlines act as EOL/End Of Expression indicators, so detect them here
-        if (curr == '\n' || curr == '\r') {
-            // only push an END_OF_EXPRESSION token if the last token isn't already
-            // an END_OF_EXPRESSION
-            if (!tokens.empty() && tokens.back().type != Type::END_OF_EXPRESSION) {
-                tokens.push_back(Token{Type::END_OF_EXPRESSION, "\\n"});
+        const Type prevToken = tokens.empty() ? Type::NONE : tokens[tokens.size() - 1].type;
+
+        // current + curr is invalid
+        if (getTokenTypeOfString(updCurrent, prevToken) == Type::INVALID) {
+            // type of current
+            Type currType = getTokenTypeOfString(current, prevToken);
+            if (currType != Type::INVALID) {
+                // current is valid; push to tokens
+                tokens.push_back(Token{currType, current});
             }
 
-            ++i;
-            continue;
+            // reset value of current
+            current = string(1, curr);
+        } else {
+            current = updCurrent;
         }
-
-        // skip whitespace
-        if (isspace(static_cast<unsigned char>(curr))) {
-            ++i;
-            continue;
-        }
-
-        // identifiers and keywords
-        if (isalpha(static_cast<unsigned char>(curr)) || curr == '_') {
-            string acc = "";
-
-            while (i < code.length() && (isalnum(static_cast<unsigned char>(code[i])) || code[i] == '_')) {
-                acc.push_back(code[i]);
-                ++i;
-            }
-
-            // check if acc is a keyword, otherwise acc is an identifier
-            Type toPush = Type::INVALID;
-            if (acc == "var") toPush = Type::VAR_KW;
-            else if (acc == "show") toPush = Type::SHOW_KW;
-            else toPush = Type::IDENTIFIER;
-
-            tokens.push_back(Token {toPush, acc});
-            continue;
-        }
-
-        // numeric literals
-        if (isdigit(static_cast<unsigned char>(curr))) {
-            string acc = "";
-
-            while (i < code.length() && isdigit(static_cast<unsigned char>(code[i]))) {
-                acc.push_back(code[i]);
-                ++i;
-            }
-
-            // push numeric literal and continue, since i has already been incremented
-            tokens.push_back(Token {Type::NUMBER_LITERAL, acc});
-            continue;
-        }
-
-        // single width symbols
-        Type toPush = Type::NONE;
-        switch (curr) {
-            // addition
-            case '+': toPush = Type::ADD; break;
-            // multiplication
-            case '*': toPush = Type::MULTIPLY; break;
-            // division
-            case '/': toPush = Type::DIVIDE; break;
-            // opening bracket
-            case '(': toPush = Type::OPEN_BRACKET; break;
-            // closing bracket
-            case ')': toPush = Type::CLOSE_BRACKET; break;
-            // modulus
-            case '%': toPush = Type::MODULO; break;
-            // assignment operator
-            case '=': toPush = Type::ASSIGN; break;
-        }
-
-        // subtract/negate (needs custom logic to disambiguate)
-        if (curr == '-') {
-            // tokens is empty: type must be NEGATE
-            if (tokens.empty()) {
-                toPush = Type::NEGATE;
-            } else { // tokens is not empty
-                const Type lastType = tokens.back().type;
-
-                toPush = findContextOfMinusSymbolBasedOnPreviousToken(lastType);
-            }
-        }
-
-        // if toPush still equals none, curr char must be invalid
-        if (toPush == Type::NONE) {
-            toPush = Type::INVALID;
-        }
-
-        tokens.push_back(Token{toPush, string(1, curr)});
 
         ++i;
     }
@@ -129,7 +54,7 @@ vector<Token> parse(string code) {
 }
 
 int main() {
-    string code = "-5 * --6 / 3 + (5 - 2) * 4 -- 2";
+    string code = "var coolNumber = 4\nshow coolNumber\nif (coolNumber != 4 or coolNumber < -1)";
     // parser function
     vector<Token> parsedTokens = parse(code);
 
