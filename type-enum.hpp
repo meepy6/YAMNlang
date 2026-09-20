@@ -68,6 +68,7 @@ enum class Type {
     END_OF_EXPRESSION
 };
 
+// these values/functions are explained in the source file: type-enum.cpp
 extern std::unordered_map<std::string, Type> strings_to_types;
 Type findContextOfMinusSymbolBasedOnPreviousToken(const Type& prev);
 bool validIdentifier(const std::string& str);

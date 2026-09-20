@@ -33,30 +33,39 @@ vector<Token> parse(string code) {
     size_t i = 0;
     string current = "";
     while (i < code.length()) {
+        // the current character
         char curr = code[i];
         LOG("curr (a.k.a. code[i]) = " << curr << endl);
 
+        // updCurrent = current with curr appended
         string updCurrent = current;
         updCurrent.push_back(curr);
 
         LOG("current = " << current << ", updCurrent = " << updCurrent << endl);
 
+        // previous token type; if tokens is empty, defaults to Type::NONE
         const Type prevToken = tokens.empty() ? Type::NONE : tokens[tokens.size() - 1].type;
 
-        // current + curr is invalid
+        // updCurrent would have Type::INVALID if it were pushed to tokens
         if (getTokenTypeOfString(updCurrent, prevToken) == Type::INVALID) {
-            // type of current
+            // get type of current
             Type currType = getTokenTypeOfString(current, prevToken);
             if (currType != Type::INVALID) {
-                // current is valid; push to tokens
+                // current would have a Type != Type::INVALID;
+                // push to tokens as current represents the longest
+                // valid string from the after the last token
                 tokens.push_back(Token{currType, current});
             }
 
-            // reset value of current
+            // reset value of current to be curr
+            // (but convert to std::string so we can add to it later)
             current = string(1, curr);
 
             LOG("current reset to = " << current << endl);
         } else {
+            // updCurrent would have a Type != Type::INVALID
+            // update current to include the newest character (curr)
+            // and continue
             current = updCurrent;
         }
 
@@ -64,10 +73,16 @@ vector<Token> parse(string code) {
         LOG(endl);
     }
 
+    // if current would have a Type != Type::INVALID
+    // after the loop ends, push it as a token
     if (!current.empty()) {
+        // previous token type; if tokens is empty, defaults to Type::NONE
         const Type prevToken = tokens.empty() ? Type::NONE : tokens[tokens.size() - 1].type;
+
+        // current token type
         Type currType = getTokenTypeOfString(current, prevToken);
 
+        // if currType != Type::INVALID, push a new token
         if (currType != Type::INVALID) {
             tokens.push_back(Token{currType, current});
         }

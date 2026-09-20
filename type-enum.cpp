@@ -2,6 +2,8 @@
 #include <cctype>
 using namespace std;
 
+// for token types that directly map to
+// a fixed sequence of characters
 unordered_map<string, Type> strings_to_types = {
     {"(", Type::OPEN_BRACKET},
 
@@ -14,7 +16,6 @@ unordered_map<string, Type> strings_to_types = {
 
     {"++", Type::INCREMENT},
 
-    // Type::SUBTRACT and Type::NEGATE are ambiguous, therefore not included
 
     {"-=", Type::SUBTRACT_ASSIGN},
 
@@ -75,17 +76,17 @@ unordered_map<string, Type> strings_to_types = {
 
     {"or", Type::LOGICAL_OR_KW},
 
-    // NOTE: Type::INVALID and Type::AMBIGUOUS do not have defined values, therefore they are excluded
-    // same goes with identifiers and literals
 
     {"\n", Type::END_OF_EXPRESSION}
 };
 
+// based on the previous token's type, determines what a succeeding '-'
+// would mean (Type::SUBTRACT or Type::NEGATE)
 Type findContextOfMinusSymbolBasedOnPreviousToken(const Type& prev) {
     switch (prev) {
         // subtract
         case Type::INCREMENT:
-    case Type::DECREMENT:
+        case Type::DECREMENT:
         case Type::CLOSE_BRACKET:
         case Type::IDENTIFIER:
         case Type::NUMBER_LITERAL: return Type::SUBTRACT;
@@ -100,8 +101,7 @@ Type findContextOfMinusSymbolBasedOnPreviousToken(const Type& prev) {
         case Type::LOGICAL_AND_KW:
         case Type::LOGICAL_OR_KW:
 
-        // shouldn't ever exist anyway, but I don't like compiler warnings LOL
-        case Type::NONE:
+        case Type::NONE: // (shouldn't ever exist anyway, but I don't like compiler warnings LOL)
 
         case Type::ADD:
         case Type::ADD_ASSIGN:
@@ -142,6 +142,11 @@ Type findContextOfMinusSymbolBasedOnPreviousToken(const Type& prev) {
     }
 }
 
+// determines if the string str would be a valid identifier
+//
+// RULES FOR VALID IDENTIFIER: similar to Java, C and other languages,
+// first character must be an underscore ('_') or a letter,
+// subsequent characters must be underscores ('_'), letters or numeric digits (0-9)
 bool validIdentifier(const string& str) {
     if (str == "") return false;
 
@@ -162,6 +167,8 @@ bool validIdentifier(const string& str) {
     return true;
 }
 
+// determines if the string str would be a valid number literal
+// i.e. any whole number (0, 1, 2...) with no decimals allowed (yet!)
 bool validNumberLiteral(const string& str) {
     if (str == "") return false;
 
@@ -175,6 +182,8 @@ bool validNumberLiteral(const string& str) {
     return true;
 }
 
+// determines what the string str would be typed if it were the value
+// for a token; defaults to Type::INVALID if str would not form a valid token
 Type getTokenTypeOfString(const string& str, const Type& prev) {
     auto search = strings_to_types.find(str);
 
