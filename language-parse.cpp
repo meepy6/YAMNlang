@@ -6,6 +6,13 @@
 #include "type-enum.hpp"
 using namespace std;
 
+// #define DEBUG_MODE (uncomment for debugging logs in parse function
+
+#ifdef DEBUG_MODE
+    #define LOG(x) cout << x
+#else
+    #define LOG(x)
+#endif // DEBUG_MODE
 
 struct Token {
     Type type;
@@ -27,8 +34,12 @@ vector<Token> parse(string code) {
     string current = "";
     while (i < code.length()) {
         char curr = code[i];
+        LOG("curr (a.k.a. code[i]) = " << curr << endl);
+
         string updCurrent = current;
         updCurrent.push_back(curr);
+
+        LOG("current = " << current << ", updCurrent = " << updCurrent << endl);
 
         const Type prevToken = tokens.empty() ? Type::NONE : tokens[tokens.size() - 1].type;
 
@@ -43,11 +54,23 @@ vector<Token> parse(string code) {
 
             // reset value of current
             current = string(1, curr);
+
+            LOG("current reset to = " << current << endl);
         } else {
             current = updCurrent;
         }
 
         ++i;
+        LOG(endl);
+    }
+
+    if (!current.empty()) {
+        const Type prevToken = tokens.empty() ? Type::NONE : tokens[tokens.size() - 1].type;
+        Type currType = getTokenTypeOfString(current, prevToken);
+
+        if (currType != Type::INVALID) {
+            tokens.push_back(Token{currType, current});
+        }
     }
 
     return tokens;

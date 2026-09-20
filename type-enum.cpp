@@ -146,7 +146,7 @@ bool validIdentifier(const string& str) {
     if (str == "") return false;
 
     // isalpha instead of isalnum: identifiers may only start with a letter or underscore
-    if (!(isalpha(static_cast<unsigned char>(str.front()) || str.front() == '_'))) {
+    if (!(isalpha(static_cast<unsigned char>(str.front())) || str.front() == '_')) {
         return false;
     }
 
@@ -154,7 +154,7 @@ bool validIdentifier(const string& str) {
         // any character except for first may be alphanumeric,
         // and we have already checked str.front(),
         // so now use isalnum
-        if (!(isalnum(static_cast<unsigned char>(str[i]) || str[i] == '_'))) {
+        if (!(isalnum(static_cast<unsigned char>(str[i])) || str[i] == '_')) {
             return false;
         }
     }
