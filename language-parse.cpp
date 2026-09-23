@@ -6,7 +6,7 @@
 #include "type-enum.hpp"
 using namespace std;
 
-// #define DEBUG_MODE (uncomment for debugging logs in parse function
+#define DEBUG_MODE (uncomment for debugging logs in parse function
 
 #ifdef DEBUG_MODE
     #define LOG(x) cout << x
@@ -31,68 +31,77 @@ vector<Token> parse(string code) {
 
     // parsing loop (uses while and manual increment to facilitate skipping ahead when we come across a literal or identifier)
     size_t i = 0;
-    string current = "";
     while (i < code.length()) {
-        // the current character
-        char curr = code[i];
-        LOG("curr (a.k.a. code[i]) = " << curr << endl);
+        // the current character (unsigned so i can avoid writing static_cast<unsigned char>(char) multiple times (some <cctype> functions require the conversion)
+        unsigned char curr = code[i];
 
-        // updCurrent = current with curr appended
-        string updCurrent = current;
-        updCurrent.push_back(curr);
+        // identifier/keyword
+        if (isalpha(curr) || curr == '_') {
+            string word = string(1, curr);
 
-        LOG("current = " << current << ", updCurrent = " << updCurrent << endl);
-
-        // previous token type; if tokens is empty, defaults to Type::NONE
-        const Type prevToken = tokens.empty() ? Type::NONE : tokens[tokens.size() - 1].type;
-
-        // updCurrent would have Type::INVALID if it were pushed to tokens
-        if (getTokenTypeOfString(updCurrent, prevToken) == Type::INVALID) {
-            // get type of current
-            Type currType = getTokenTypeOfString(current, prevToken);
-            if (currType != Type::INVALID) {
-                // current would have a Type != Type::INVALID;
-                // push to tokens as current represents the longest
-                // valid string from the after the last token
-                tokens.push_back(Token{currType, current});
+            ++i;
+            // consume characters until we hit a non-alphanumeric character that is not '_' ([a-z][A-Z][0-9]_)
+            while ((isalnum(static_cast<unsigned char>(code[i])) || code[i] == '_') && i < code.length()) {
+                word.push_back(code[i]);
+                ++i;
             }
 
-            // reset value of current to be curr
-            // (but convert to std::string so we can add to it later)
-            current = string(1, curr);
+            // check if keyword_strings_to_types contain word
+            auto searchForWordInKeywords = keyword_strings_to_types.find(word);
 
-            LOG("current reset to = " << current << endl);
-        } else {
-            // updCurrent would have a Type != Type::INVALID
-            // update current to include the newest character (curr)
-            // and continue
-            current = updCurrent;
+            // if so, push that keyword
+            if (searchForWordInKeywords != keyword_strings_to_types.end()) {
+                tokens.push_back(Token{keyword_strings_to_types[word], word});
+            } else {
+                // otherwise, word is Type::IDENTIFIER
+                tokens.push_back(Token{Type::IDENTIFIER, word});
+            }
+
+            continue;
+        }
+
+        // number literal
+        if (isdigit(curr)) {
+            string word = string(1, curr);
+
+            ++i;
+            // consume characters until we hit a non-digit character
+            while (isdigit(static_cast<unsigned char>(code[i]))) {
+                word.push_back(code[i]);
+                ++i;
+            }
+
+            // push numeric literal
+            tokens.push_back(Token{Type::NUMBER_LITERAL, word});
+            continue;
+        }
+
+        // string literal
+        if (curr == '"') {
+            string word = string(1, curr);
+
+            ++i;
+            // consume characters until closing quote (")
+            while (code[i] != '"') {
+                word.push_back(code[i]);
+                ++i;
+            }
+
+            // push closing quote!!!
+            word.push_back(code[i]);
+
+            // push string literal
+            tokens.push_back(Token{Type::STRING_LITERAL, word});
         }
 
         ++i;
-        LOG(endl);
-    }
-
-    // if current would have a Type != Type::INVALID
-    // after the loop ends, push it as a token
-    if (!current.empty()) {
-        // previous token type; if tokens is empty, defaults to Type::NONE
-        const Type prevToken = tokens.empty() ? Type::NONE : tokens[tokens.size() - 1].type;
-
-        // current token type
-        Type currType = getTokenTypeOfString(current, prevToken);
-
-        // if currType != Type::INVALID, push a new token
-        if (currType != Type::INVALID) {
-            tokens.push_back(Token{currType, current});
-        }
     }
 
     return tokens;
 }
 
 int main() {
-    string code = "var coolNumber = 4\nshow coolNumber\nif (coolNumber != 4 or coolNumber < -1)";
+    string code = "var coolString = \"Hello, world!\"\nif (coolString != \"Good morning\")";
     // parser function
     vector<Token> parsedTokens = parse(code);
 

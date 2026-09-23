@@ -4,10 +4,10 @@
 #include "trie-tree.hpp"
 
 namespace trie {
-    Trie() : root(std::make_unique<TrieNode>()) {}
+    Trie::Trie() : root(std::make_unique<TrieNode>()) {}
 
-    void insert(const std::string& word) {
-        TrieNode* current = root.get();
+    void Trie::insert(const std::string& word) {
+        TrieNode* current = Trie::root.get();
 
         for (char ch : word) {
             if (current->children.find(ch) == current->children.end()) {
@@ -20,8 +20,9 @@ namespace trie {
         current->is_end_of_path = true;
     }
 
-    bool search(const std::string& word) const {
-        TrieNode* current = root.get();
+    bool Trie::search(const std::string& word) const {
+        TrieNode* current = Trie::root.get();
+
         for (char ch : word) {
             auto it = current->children.find(ch);
             if (it == current->children.end()) return false;
@@ -30,8 +31,9 @@ namespace trie {
         return current->is_end_of_path;
     }
 
-    bool startsWith(const std::string& prefix) const {
-        TrieNode* current = root.get();
+    bool Trie::startsWith(const std::string& prefix) const {
+        TrieNode* current = Trie::root.get();
+
         for (char ch : prefix) {
             auto it = current->children.find(ch);
             if (it == current->children.end()) return false;
@@ -39,4 +41,4 @@ namespace trie {
         }
         return true;
     }
-)
+}

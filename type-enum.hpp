@@ -11,6 +11,7 @@ enum class Type {
 
     // literals and identifiers
     NUMBER_LITERAL,
+    STRING_LITERAL,
     IDENTIFIER,
 
     // symbols
@@ -70,9 +71,11 @@ enum class Type {
 
 // these values/functions are explained in the source file: type-enum.cpp
 extern std::unordered_map<std::string, Type> strings_to_types;
+extern std::unordered_map<std::string, Type> keyword_strings_to_types;
 Type findContextOfMinusSymbolBasedOnPreviousToken(const Type& prev);
 bool validIdentifier(const std::string& str);
 bool validNumberLiteral(const std::string& str);
+bool validStringLiteral(const std::string& str);
 Type getTokenTypeOfString(const std::string& str, const Type& prev);
 
 std::ostream& operator <<(std::ostream& os, const Type& type);

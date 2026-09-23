@@ -60,6 +60,10 @@ unordered_map<string, Type> strings_to_types = {
     {"!", Type::BOOLEAN_INVERSION},
 
 
+    {"\n", Type::END_OF_EXPRESSION}
+};
+
+unordered_map<string, Type> keyword_strings_to_types = {
     {"var", Type::VAR_KW},
 
     {"show", Type::SHOW_KW},
@@ -75,9 +79,6 @@ unordered_map<string, Type> strings_to_types = {
     {"and", Type::LOGICAL_AND_KW},
 
     {"or", Type::LOGICAL_OR_KW},
-
-
-    {"\n", Type::END_OF_EXPRESSION}
 };
 
 // based on the previous token's type, determines what a succeeding '-'
@@ -88,6 +89,7 @@ Type findContextOfMinusSymbolBasedOnPreviousToken(const Type& prev) {
         case Type::INCREMENT:
         case Type::DECREMENT:
         case Type::CLOSE_BRACKET:
+        case Type::STRING_LITERAL:
         case Type::IDENTIFIER:
         case Type::NUMBER_LITERAL: return Type::SUBTRACT;
 
@@ -182,6 +184,21 @@ bool validNumberLiteral(const string& str) {
     return true;
 }
 
+bool validStringLiteral(const string& str) {
+    if (str == "") return false;
+
+    if (str.front() != '"' || str.back() != '"') return false;
+
+    for (size_t i = 0; i < str.length(); ++i) {
+        // no character may be " (not supporting escape chars yet)
+        if (str[i] == '"') {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 // determines what the string str would be typed if it were the value
 // for a token; defaults to Type::INVALID if str would not form a valid token
 Type getTokenTypeOfString(const string& str, const Type& prev) {
@@ -195,6 +212,8 @@ Type getTokenTypeOfString(const string& str, const Type& prev) {
             return findContextOfMinusSymbolBasedOnPreviousToken(prev);
         } else if (validNumberLiteral(str)) {
             return Type::NUMBER_LITERAL;
+        } else if (validStringLiteral(str)) {
+            return Type::STRING_LITERAL;
         } else if (validIdentifier(str)) {
             return Type::IDENTIFIER;
         } else {
@@ -208,6 +227,7 @@ ostream& operator<<(ostream& os, const Type& type) {
     string toOstream = "";
     switch (type) {
         case Type::NUMBER_LITERAL: toOstream = "NUMBER_LITERAL"; break;
+        case Type::STRING_LITERAL: toOstream = "STRING_LITERAL"; break;
         case Type::IDENTIFIER: toOstream = "IDENTIFIER"; break;
         case Type::OPEN_BRACKET: toOstream = "OPEN_BRACKET"; break;
         case Type::CLOSE_BRACKET: toOstream = "CLOSE_BRACKET"; break;
