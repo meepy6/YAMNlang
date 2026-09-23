@@ -4,7 +4,9 @@
 #include <cctype>
 #include <unordered_map>
 #include "type-enum.hpp"
+#include "trie-class/trie-tree.hpp"
 using namespace std;
+using namespace trie;
 
 #define DEBUG_MODE (uncomment for debugging logs in parse function
 
@@ -25,7 +27,20 @@ ostream& operator<<(ostream& os, const Token& token) {
     return os;
 }
 
+Trie generateTrieFromStrings(vector<string> strings) {
+    Trie newTrie = Trie();
+
+    for (const auto& str : strings) {
+        newTrie.insert(str);
+    }
+
+    return newTrie;
+}
+
 vector<Token> parse(string code) {
+    // initialise symbol trie
+    static const Trie symbolTrie = generateTrieFromStrings(valid_symbols);
+
     // initialise tokens vector
     vector<Token> tokens = { };
 
@@ -92,6 +107,26 @@ vector<Token> parse(string code) {
 
             // push string literal
             tokens.push_back(Token{Type::STRING_LITERAL, word});
+        }
+
+        // symbols
+        if (symbolTrie.startsWith(string(1, curr))) {
+            string word = "";
+            TrieNode* current = symbolTrie.root.get();
+
+            while (true) {
+                char nextCh = code[i];
+
+                if (current->children.find(nextCh) != current->children.end()) {
+                    current = &(current->children[nextCh]); // advance down the tree
+                    word.push_back(nextCh);
+                    ++i;
+                } else {
+                    Type type = current->is_end_of_path ? getTokenTypeOfString(word, tokens.back().type) : Type::INVALID;
+                    tokens.push_back(Token{type, word});
+                    break;
+                }
+            }
         }
 
         ++i;

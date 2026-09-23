@@ -4,6 +4,7 @@
 #include <string>
 #include <unordered_map>
 #include <ostream>
+#include <vector>
 
 enum class Type {
     // the absence of a meaningful type
@@ -72,6 +73,7 @@ enum class Type {
 // these values/functions are explained in the source file: type-enum.cpp
 extern std::unordered_map<std::string, Type> strings_to_types;
 extern std::unordered_map<std::string, Type> keyword_strings_to_types;
+extern std::vector<std::string> valid_symbols;
 Type findContextOfMinusSymbolBasedOnPreviousToken(const Type& prev);
 bool validIdentifier(const std::string& str);
 bool validNumberLiteral(const std::string& str);

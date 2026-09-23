@@ -12,12 +12,10 @@ namespace trie {
     };
 
     class Trie {
-    private:
-        std::unique_ptr<TrieNode> root;
-
     public:
         Trie();
 
+        std::unique_ptr<TrieNode> root;
         void insert(const std::string& word);
         bool search(const std::string& word) const;
         bool startsWith(const std::string& prefix) const;

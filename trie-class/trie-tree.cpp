@@ -28,6 +28,7 @@ namespace trie {
             if (it == current->children.end()) return false;
             current = it->second.get();
         }
+
         return current->is_end_of_path;
     }
 
@@ -39,6 +40,7 @@ namespace trie {
             if (it == current->children.end()) return false;
             current = it->second.get();
         }
+
         return true;
     }
 }

@@ -81,6 +81,8 @@ unordered_map<string, Type> keyword_strings_to_types = {
     {"or", Type::LOGICAL_OR_KW},
 };
 
+vector<string> valid_symbols = {"+", "++", "+=", "-", "--", "-=", "*", "*=", "/", "/=", "//", "//=", "!=", "!", "%", "%=", "=", "==", "<", ">", "<=", ">=", "(", ")"};
+
 // based on the previous token's type, determines what a succeeding '-'
 // would mean (Type::SUBTRACT or Type::NEGATE)
 Type findContextOfMinusSymbolBasedOnPreviousToken(const Type& prev) {
