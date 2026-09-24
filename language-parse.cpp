@@ -37,7 +37,7 @@ Trie generateTrieFromStrings(vector<string> strings) {
     return newTrie;
 }
 
-vector<Token> parse(string code) {
+vector<Token> lex(string code) {
     // initialise symbol trie
     static const Trie symbolTrie = generateTrieFromStrings(valid_symbols);
 
@@ -61,14 +61,14 @@ vector<Token> parse(string code) {
                 ++i;
             }
 
-            // check if keyword_strings_to_types contain word
-            auto searchForWordInKeywords = keyword_strings_to_types.find(word);
+            // check if getTokenTypeOfKeyword(word) != Type::INVALID
+            Type keywordTokenType = getTokenTypeOfKeyword(word);
 
             // if so, push that keyword
-            if (searchForWordInKeywords != keyword_strings_to_types.end()) {
-                tokens.push_back(Token{keyword_strings_to_types[word], word});
+            if (keywordTokenType != Type::INVALID) {
+                tokens.push_back(Token{keywordTokenType, word});
             } else {
-                // otherwise, word is Type::IDENTIFIER
+                // otherwise, check if word is Type::IDENTIFIER
                 tokens.push_back(Token{Type::IDENTIFIER, word});
             }
 
@@ -80,8 +80,8 @@ vector<Token> parse(string code) {
             string word = string(1, curr);
 
             ++i;
-            // consume characters until we hit a non-digit character
-            while (isdigit(static_cast<unsigned char>(code[i]))) {
+            // consume characters until we hit a non-digit character or EOF
+            while (isdigit(static_cast<unsigned char>(code[i])) && i < code.length()) {
                 word.push_back(code[i]);
                 ++i;
             }
@@ -96,17 +96,19 @@ vector<Token> parse(string code) {
             string word = string(1, curr);
 
             ++i;
-            // consume characters until closing quote (")
-            while (code[i] != '"') {
+            // consume characters until closing quote (") or EOF
+            while (code[i] != '"' && i < code.length()) {
                 word.push_back(code[i]);
                 ++i;
             }
 
             // push closing quote!!!
             word.push_back(code[i]);
+            ++i;
 
             // push string literal
             tokens.push_back(Token{Type::STRING_LITERAL, word});
+            continue;
         }
 
         // symbols
@@ -118,15 +120,18 @@ vector<Token> parse(string code) {
                 char nextCh = code[i];
 
                 if (current->children.find(nextCh) != current->children.end()) {
-                    current = &(current->children[nextCh]); // advance down the tree
+                    current = current->children[nextCh].get(); // advance down the tree
                     word.push_back(nextCh);
                     ++i;
                 } else {
-                    Type type = current->is_end_of_path ? getTokenTypeOfString(word, tokens.back().type) : Type::INVALID;
+                    Type prevType = !tokens.empty() ? getTokenTypeOfCode(word, tokens.back().type) : Type::NONE;
+                    Type type = current->is_end_of_path ?  prevType: Type::INVALID;
                     tokens.push_back(Token{type, word});
                     break;
                 }
             }
+
+            continue;
         }
 
         ++i;
@@ -137,10 +142,10 @@ vector<Token> parse(string code) {
 
 int main() {
     string code = "var coolString = \"Hello, world!\"\nif (coolString != \"Good morning\")";
-    // parser function
-    vector<Token> parsedTokens = parse(code);
+    // lexer function
+    vector<Token> lexedTokens = lex(code);
 
-    for (const auto& token : parsedTokens) {
+    for (const auto& token : lexedTokens) {
         cout << token << endl;
     }
 }

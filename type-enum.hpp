@@ -72,13 +72,15 @@ enum class Type {
 
 // these values/functions are explained in the source file: type-enum.cpp
 extern std::unordered_map<std::string, Type> strings_to_types;
-extern std::unordered_map<std::string, Type> keyword_strings_to_types;
-extern std::vector<std::string> valid_symbols;
+extern const std::unordered_map<std::string, Type> keyword_strings_to_types;
+extern const std::vector<std::string> valid_symbols;
 Type findContextOfMinusSymbolBasedOnPreviousToken(const Type& prev);
 bool validIdentifier(const std::string& str);
 bool validNumberLiteral(const std::string& str);
 bool validStringLiteral(const std::string& str);
-Type getTokenTypeOfString(const std::string& str, const Type& prev);
+Type getTokenTypeOfCode(const std::string& str, const Type& prev);
+Type getTokenTypeOfSymbol(const std::string& str, const Type& prev);
+Type getTokenTypeOfKeyword(const std::string& str);
 
 std::ostream& operator <<(std::ostream& os, const Type& type);
 
