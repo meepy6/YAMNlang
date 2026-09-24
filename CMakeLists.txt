@@ -13,6 +13,6 @@ endif()
 
 add_executable(language_parse
     language-parse.cpp
-    type-enum.cpp
+    token-type/type-enum.cpp
     trie-class/trie-tree.cpp
 )

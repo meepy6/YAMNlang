@@ -3,7 +3,7 @@
 #include <string>
 #include <cctype>
 #include <unordered_map>
-#include "type-enum.hpp"
+#include "token-type/type-enum.hpp"
 #include "trie-class/trie-tree.hpp"
 using namespace std;
 using namespace trie;
@@ -38,7 +38,7 @@ Trie generateTrieFromStrings(vector<string> strings) {
 }
 
 vector<Token> lex(string code) {
-    // initialise symbol trie
+    // initialise symbol trie (static const, is never modified and should be shared between calls to save memory)
     static const Trie symbolTrie = generateTrieFromStrings(valid_symbols);
 
     // initialise tokens vector

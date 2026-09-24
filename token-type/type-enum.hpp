@@ -20,45 +20,45 @@ enum class Type {
     CLOSE_BRACKET,
 
     ADD,
-    ADD_ASSIGN, // new
-    INCREMENT, // new
+    ADD_ASSIGN,
+    INCREMENT,
 
     SUBTRACT,
     NEGATE,
-    SUBTRACT_ASSIGN, // new
-    DECREMENT, // new
+    SUBTRACT_ASSIGN,
+    DECREMENT,
 
     MULTIPLY,
-    MULTIPLY_ASSIGN, // new
+    MULTIPLY_ASSIGN,
 
     DIVIDE,
-    DIVIDE_ASSIGN, // new
+    DIVIDE_ASSIGN,
 
-    FLOOR_DIVIDE, // new
-    FLOOR_DIVIDE_ASSIGN, // new
+    FLOOR_DIVIDE,
+    FLOOR_DIVIDE_ASSIGN,
 
     MODULO,
-    MODULO_ASSIGN, // new
+    MODULO_ASSIGN,
 
     ASSIGN,
 
-    EQUALITY_COMPARISON, // new
-    LESS_THAN_COMPARISON, // new
-    MORE_THAN_COMPARISON, // new
-    LESS_THAN_EQUALS_COMPARISON, // new
-    MORE_THAN_EQUALS_COMPARISON, // new
-    INEQUALITY_COMPARISON, // new
-    BOOLEAN_INVERSION, // new
+    EQUALITY_COMPARISON,
+    LESS_THAN_COMPARISON,
+    MORE_THAN_COMPARISON,
+    LESS_THAN_EQUALS_COMPARISON,
+    MORE_THAN_EQUALS_COMPARISON,
+    INEQUALITY_COMPARISON,
+    BOOLEAN_INVERSION,
 
     // keywords (denoted by the suffix _KW)
     VAR_KW,
     SHOW_KW,
-    IF_KW, // new
-    ELSE_KW, // new
-    REPEAT_KW, // new
-    WHILE_KW, // new
-    LOGICAL_AND_KW, // new
-    LOGICAL_OR_KW, // new
+    IF_KW,
+    ELSE_KW,
+    REPEAT_KW,
+    WHILE_KW,
+    LOGICAL_AND_KW,
+    LOGICAL_OR_KW,
 
     // invalid
     INVALID,
@@ -71,8 +71,6 @@ enum class Type {
 };
 
 // these values/functions are explained in the source file: type-enum.cpp
-extern std::unordered_map<std::string, Type> strings_to_types;
-extern const std::unordered_map<std::string, Type> keyword_strings_to_types;
 extern const std::vector<std::string> valid_symbols;
 Type findContextOfMinusSymbolBasedOnPreviousToken(const Type& prev);
 bool validIdentifier(const std::string& str);
