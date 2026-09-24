@@ -50,6 +50,13 @@ vector<Token> lex(string code) {
         // the current character (unsigned so i can avoid writing static_cast<unsigned char>(char) multiple times (some <cctype> functions require the conversion)
         unsigned char curr = code[i];
 
+        // newline
+        if (curr == '\n') {
+            tokens.push_back(Token{Type::END_OF_EXPRESSION, "\n"});
+            ++i;
+            continue;
+        }
+
         // identifier/keyword
         if (isalpha(curr) || curr == '_') {
             string word = string(1, curr);
